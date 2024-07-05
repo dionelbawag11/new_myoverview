@@ -1,0 +1,141 @@
+<div class="card dashboard-card" role="listitem" data-region="course-content" data-course-id="{{{id}}}">
+    <section id="slider" class="pt-5">
+        <div class="container mb-3">
+            <div class="slider">
+                <div class="owl-carousel">
+                    {{#courses}}
+                    <div class="slider-card">
+                        <div class="card-inner">
+                            <div class="card-front"  style="background-color: {{backcardcolor}};">
+                                <a href="{{viewurl}}" tabindex="-1" class="mw-100 w-100 mh-100 h-25">
+                                    <div class="summaryimage card-img dashboard-list-img mw-100" style='background-image: url("{{{courseimage}}}");'>
+                                        <span class="sr-only">{{#str}}aria:courseimage, core_course{{/str}}</span>
+                                    </div>
+                                </a>
+                                <div class="card-body text-center">
+                                    <div class="card-content d-flex justify-content-around align-items-center">
+                                        <div class="favouriteicon">
+                                            {{> core_course/favouriteicon }}
+                                        </div>
+                                        <div class="fullname">
+                                            <b>{{fullname}}</b>
+                                        </div>
+                                        <div class="course-action">
+                                            {{> block_myoverview/course-action-menu }}
+                                        </div>
+                                    </div>
+                                    <div class="summary-text mb-3">
+                                        <span class="sr-only">{{#str}}aria:coursesummary, block_myoverview{{/str}}</span>
+                                        {{{summary}}}
+                                    </div>
+                                </div>
+                                  <button class="see-more-btn">See more...</button>
+                                    <div class="progress">
+                                      <div class="progress-bar" role="progressbar" style="width: {{progress}}%;" aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100">
+                                        <span class="progress-text-color">{{progress}}% Complete</span>
+                                      </div>
+                                    </div>
+                            </div>
+                            <div class="card-back"  style="background-color: {{frontcardcolor}};">
+                                <div class="card-body text-center">
+                                    <div class="card-content d-flex justify-content-around align-items-center">
+                                        <div class="favouriteicon">
+                                            {{> core_course/favouriteicon }}
+                                        </div>
+                                        <div class="fullname">
+                                            <b>{{fullname}}</b>
+                                        </div>
+                                        <div class="course-action">
+                                            {{> block_myoverview/course-action-menu }}
+                                        </div>
+                                    </div>
+                                    <div class="summary-text-back mb-3">
+                                        <span class="sr-only">{{#str}}aria:coursesummary, block_myoverview{{/str}}</span>
+                                        {{{summary}}}
+                                    </div>
+                                   
+                                </div>
+                                 <button class="see-less-btn">See less...</button>
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar" style="width: {{progress}}%;" aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100">
+                                              <span class="progress-text-color">{{progress}}% Complete</span>
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                    {{/courses}}
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+{{#js}}
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
+<link rel="stylesheet" type="text/css" href="{{{block_new_myoverview/styles.css}}}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+<script>
+$(document).ready(function() {
+    function checkSummaryLength() {
+        const charLimit = 300; // Set the character limit for showing "See more"
+
+        $('.slider-card').each(function() {
+            var summaryText = $(this).find('.summary-text');
+            var seeMoreBtn = $(this).find('.see-more-btn');
+            var summaryContent = summaryText.text().trim();
+
+            if (summaryContent.length > charLimit) {
+                seeMoreBtn.show();
+            } else {
+                seeMoreBtn.hide();
+            }
+        });
+    }
+
+    checkSummaryLength(); // Run the function on page load
+
+    $(".see-more-btn").click(function() {
+        $(this).closest('.slider-card').addClass('flipped');
+    });
+
+    $(".see-less-btn").click(function() {
+        $(this).closest('.slider-card').removeClass('flipped');
+    });
+
+    // Owlcarousel initialization
+    var courseCount = $(".owl-carousel .slider-card").length;
+    var itemsToShow = courseCount < 3 ? courseCount : 3; // Show the number of courses if less than 3, otherwise show 3
+    var loopEnabled = courseCount > 3; // Enable loop if there are more than 3 courses
+
+    $(".owl-carousel").owlCarousel({
+        loop: loopEnabled, // Enable loop based on the number of courses
+        margin: 10,
+        nav: true,
+        autoplay: false,
+        autoplayTimeout: 3000,
+        autoplayHoverPause: true,
+        center: true, // Center the active item
+        navText: [
+            "<i class='fa fa-angle-left'></i>",
+            "<i class='fa fa-angle-right'></i>"
+        ],
+        responsive: {
+            0: {
+                items: 1 // Show 1 item on small screens
+            },
+            600: {
+                items: 1 // Show 1 item on medium screens
+            },
+            1000: {
+                items: itemsToShow // Show the calculated number of items on large screens
+            }
+        },
+        rewind: true // Enable rewinding
+    });
+});
+</script>
+{{/js}}
