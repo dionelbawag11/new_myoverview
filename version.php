@@ -17,17 +17,17 @@
 /**
  * Plugin version and other meta-data are defined here.
  *
- * @package     block_new_myoverview
+ * @package     block_myoverview_plus
  * @copyright   2024 Dionel <bawagdionel@gmail.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'block_new_myoverview';
-$plugin->version = 2024062500;
-$plugin->requires = 2021051700;
-$plugin->maturity = MATURITY_BETA;
+$plugin->version   = 2023030300;         
+$plugin->requires  = 2020060900;        
+$plugin->component = 'block_myoverview_plus';
+$plugin->maturity  = MATURITY_STABLE;
 $plugin->dependencies = [
     'block_myoverview' => ANY_VERSION,
 ];

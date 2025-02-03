@@ -37,7 +37,7 @@ const TEMPLATES = {
     COURSES_CARDS: 'block_myoverview/view-cards',
     COURSES_LIST: 'block_myoverview/view-list',
     COURSES_SUMMARY: 'block_myoverview/view-summary',
-    COURSES_CAROUSEL: 'block_new_myoverview/view-carousel',
+    COURSES_CAROUSEL: 'block_myoverview_plus/view-carousel',
     NOCOURSES: 'core_course/no-courses'
 };
 

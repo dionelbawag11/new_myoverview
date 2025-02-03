@@ -17,7 +17,7 @@
 /**
  * Code that is executed before the tables and data are dropped during the plugin uninstallation.
  *
- * @package     block_new_myoverview
+ * @package     block_myoverview_plus
  * @category    upgrade
  * @copyright   2024 Dionel <bawagdionel@gmail.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Custom uninstallation procedure.
  */
-function xmldb_block_new_myoverview_uninstall() {
+function xmldb_block_myoverview_plus_uninstall() {
 
     return true;
 }

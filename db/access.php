@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Block new_myoverview access
+ * Block myoverview_plus access
  *
- * @package     block_new_myoverview
+ * @package     block_myoverview_plus
  * @copyright   2021 Laurent David <laurent@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
 
-    'block/new_myoverview:myaddinstance' => array(
+    'block/myoverview_plus:myaddinstance' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(
@@ -37,7 +37,7 @@ $capabilities = array(
         'clonepermissionsfrom' => 'moodle/my:manageblocks'
     ),
 
-    'block/new_myoverview:addinstance' => array(
+    'block/myoverview_plus:addinstance' => array(
         'riskbitmask' => RISK_SPAM | RISK_XSS,
 
         'captype' => 'write',

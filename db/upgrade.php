@@ -17,7 +17,7 @@
 /**
  * Plugin upgrade steps are defined here.
  *
- * @package     block_new_myoverview
+ * @package     block_myoverview_plus
  * @category    upgrade
  * @copyright   2024 Dionel <bawagdionel@gmail.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,12 +26,12 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Execute block_new_myoverview upgrade from the given old version.
+ * Execute block_myoverview_plus upgrade from the given old version.
  *
  * @param int $oldversion
  * @return bool
  */
-function xmldb_block_new_myoverview_upgrade($oldversion) {
+function xmldb_block_myoverview_plus_upgrade($oldversion) {
     global $DB;
 
     $dbman = $DB->get_manager();

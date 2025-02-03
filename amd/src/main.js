@@ -20,8 +20,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import * as View from 'block_new_myoverview/view';
-import * as ViewNav from 'block_new_myoverview/view_nav';
+import * as View from 'block_myoverview_plus/view';
+import * as ViewNav from 'block_myoverview_plus/view_nav';
 
 /**
  * Initialise all of the modules for the overview block.

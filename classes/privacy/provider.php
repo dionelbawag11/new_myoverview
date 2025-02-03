@@ -17,19 +17,19 @@
 /**
  * File containing the class implementing moodle's privacy API for the new overview block.
  *
- * @package     block_new_myoverview
+ * @package     block_myoverview_plus
  * @copyright   2023 Laurent David <laurent@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author      Martin CORNU-MANSUY <martin@call-learning.fr>
  */
-namespace block_new_myoverview\privacy;
+namespace block_myoverview_plus\privacy;
 
 use core_privacy\local\metadata\null_provider;
 
 /**
  * Class implementing moodle's privacy API for the new overview block.
  *
- * @package     block_new_myoverview
+ * @package     block_myoverview_plus
  * @copyright   2023 Laurent David <laurent@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

@@ -14,29 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-/**
- * Block new_myoverview is defined here.
- *
- * @package     block_new_myoverview
- * @copyright   2024 Dionel <bawagdionel@gmail.com>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+use block_myoverview_plus\output\main;
 
-use block_new_myoverview\output\main;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
+require_once($CFG->dirroot . '/blocks/myoverview_plus/lib.php');
+require_once($CFG->dirroot . '/blocks/myoverview/block_myoverview.php');
 
- require_once($CFG->dirroot . '/blocks/myoverview/block_myoverview.php');
-class block_new_myoverview extends block_myoverview {
+class block_myoverview_plus extends block_myoverview {
 
-    
     /**
      * Initializes class member variables.
      */
     public function init() {
-        // Needed by Moodle to differentiate between blocks.
-        $this->title = get_string('pluginname', 'block_new_myoverview');
+        // Set block title.
+        $this->title = get_string('pluginname', 'block_myoverview_plus');
     }
 
     /**
@@ -48,17 +41,32 @@ class block_new_myoverview extends block_myoverview {
         if (isset($this->content)) {
             return $this->content;
         }
+
+        // Fetch user preferences.
         $group = get_user_preferences('block_myoverview_user_grouping_preference');
         $sort = get_user_preferences('block_myoverview_user_sort_preference');
-        $view = get_user_preferences('block_myoverview_user_view_preference');
+        $view = get_user_preferences('block_myoverview_user_view_preference', BLOCK_MYOVERVIEW_VIEW_CARD);
         $paging = get_user_preferences('block_myoverview_user_paging_preference');
         $customfieldvalue = get_user_preferences('block_myoverview_user_grouping_customfieldvalue_preference');
+
+        // Ensure carousel view is included.
+        if (!in_array($view, [
+            BLOCK_MYOVERVIEW_VIEW_CARD,
+            BLOCK_MYOVERVIEW_VIEW_LIST,
+            BLOCK_MYOVERVIEW_VIEW_SUMMARY,
+            BLOCK_MYOVERVIEW_VIEW_CAROUSEL // Added carousel view support.
+        ])) {
+            $view = BLOCK_MYOVERVIEW_VIEW_CARD; // Default fallback.
+        }
+        var_dump($group, $sort, $view, $paging);
+        // Create renderable output.
         $renderable = new main($group, $sort, $view, $paging, $customfieldvalue);
-        $renderer = $this->page->get_renderer('block_new_myoverview');
         $this->content = new stdClass();
+        
+        // Use the custom renderer.
+        $renderer = $this->page->get_renderer('block_myoverview_plus');
         $this->content->text = $renderer->render($renderable);
         $this->content->footer = '';
-        $this->page->requires->js_call_amd('block_new_myoverview', 'init');
         return $this->content;
     }
 
@@ -68,10 +76,9 @@ class block_new_myoverview extends block_myoverview {
      * The function is called immediately after init().
      */
     public function specialization() {
-
-        // Load user defined title and make sure it's never empty.
+        // Load user-defined title and make sure it's never empty.
         if (empty($this->config->title)) {
-            $this->title = get_string('pluginname', 'block_new_myoverview');
+            $this->title = get_string('pluginname', 'block_myoverview_plus');
         } else {
             $this->title = $this->config->title;
         }
@@ -86,22 +93,12 @@ class block_new_myoverview extends block_myoverview {
         return true;
     }
 
-    // /**
-    //  * Sets the applicable formats for the block.
-    //  *
-    //  * @return string[] Array of pages and permissions.
-    //  */
-    // public function applicable_formats() {
-    //         return [
-    //             'course-view' => true,
-    //             'site' => true,
-    //             'mod' => false,
-    //             'my' => false,
-    //         ];
-        
-    // }
-    public function _self_test()
-    {
+    /**
+     * Self-test method for the block.
+     *
+     * @return bool True if the self-test passes.
+     */
+    public function _self_test() {
         return true;
     }
 }

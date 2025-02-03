@@ -17,7 +17,7 @@
 /**
  * Plugin strings are defined here.
  *
- * @package     block_new_myoverview
+ * @package     block_myoverview_plus
  * @category    string
  * @copyright   2024 Dionel <bawagdionel@gmail.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'New Myoverview';
 
-
+$string['carousel'] = 'Carousel';
 //new filters
 $string['aria:mandatory'] = 'Show mandatory courses';
 $string['aria:notstarted'] = 'Show not started courses';
@@ -52,6 +52,6 @@ $string['aria:favourites'] = 'Show prioritized courses';
 $string['aria:removefromfavourites'] = 'Remove prioritize for';
 
 $string['title'] = 'Title';
-$string['new_myoverview:addinstance'] = 'Add a new my overview block';
-$string['new_myoverview:myaddinstance'] = 'Add a new my overview block to my moodle';
+$string['myoverview_plus:addinstance'] = 'Add a new my overview block';
+$string['myoverview_plus:myaddinstance'] = 'Add a new my overview block to my moodle';
 $string['privacy:metadata'] = 'The new my overview block just enhance the core my overview block, it doesn"t sotre any data.';

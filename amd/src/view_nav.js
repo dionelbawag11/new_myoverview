@@ -23,7 +23,7 @@
 import $ from 'jquery';
 import * as CustomEvents from 'core/custom_interaction_events';
 import * as Repository from 'block_myoverview/repository';
-import * as View from 'block_new_myoverview/view';
+import * as View from 'block_myoverview_plus/view';
 import SELECTORS from 'block_myoverview/selectors';
 
 /**

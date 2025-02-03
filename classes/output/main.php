@@ -21,7 +21,7 @@
  * @copyright  2017 Ryan Wyllie <ryan@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace block_new_myoverview\output;
+namespace block_myoverview_plus\output;
 
 use renderer_base;
 

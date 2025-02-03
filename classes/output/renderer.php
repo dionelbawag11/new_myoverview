@@ -21,7 +21,7 @@
  * @copyright  2016 Ryan Wyllie <ryan@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace block_new_myoverview\output;
+namespace block_myoverview_plus\output;
 
 use plugin_renderer_base;
 
@@ -41,6 +41,6 @@ class renderer extends plugin_renderer_base {
      * @return string HTML string
      */
     public function render_main(main $main) {
-        return $this->render_from_template('block_new_myoverview/main', $main->export_for_template($this));
+        return $this->render_from_template('block_myoverview_plus/main', $main->export_for_template($this));
     }
 }

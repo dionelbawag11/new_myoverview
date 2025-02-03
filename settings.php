@@ -25,19 +25,19 @@
 defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
-    require_once($CFG->dirroot . '/blocks/new_myoverview/lib.php');
+    require_once($CFG->dirroot . '/blocks/myoverview_plus/lib.php');
 
 
 // Front card background color setting
-$name = 'block_new_myoverview/frontcardcolor';
-$title = get_string('frontcardcolor', 'block_new_myoverview');
-$description = get_string('frontcardcolordesc', 'block_new_myoverview');
+$name = 'block_myoverview_plus/frontcardcolor';
+$title = get_string('frontcardcolor', 'block_myoverview_plus');
+$description = get_string('frontcardcolordesc', 'block_myoverview_plus');
 $settings->add(new admin_setting_configcolourpicker($name, $title, $description, ''));
 
 // Back card background color setting
-$name = 'block_new_myoverview/backcardcolor';
-$title = get_string('backcardcolor', 'block_new_myoverview');
-$description = get_string('backcardcolordesc', 'block_new_myoverview');
+$name = 'block_myoverview_plus/backcardcolor';
+$title = get_string('backcardcolor', 'block_myoverview_plus');
+$description = get_string('backcardcolordesc', 'block_myoverview_plus');
 $settings->add(new admin_setting_configcolourpicker($name, $title, $description, ''));
     
     $settings->add(new admin_setting_heading('block_myoverview/appearance',
@@ -55,7 +55,7 @@ $settings->add(new admin_setting_configcolourpicker($name, $title, $description,
     $choices = array(BLOCK_MYOVERVIEW_VIEW_CARD => get_string('card', 'block_myoverview'),
             BLOCK_MYOVERVIEW_VIEW_LIST => get_string('list', 'block_myoverview'),
             BLOCK_MYOVERVIEW_VIEW_SUMMARY => get_string('summary', 'block_myoverview'),
-        BLOCK_MYOVERVIEW_VIEW_CAROUSEL => get_string('carousel', 'block_new_myoverview'));
+        BLOCK_MYOVERVIEW_VIEW_CAROUSEL => get_string('carousel', 'block_myoverview_plus'));
     $settings->add(new admin_setting_configmulticheckbox(
             'block_myoverview/layouts',
             get_string('layouts', 'block_myoverview'),

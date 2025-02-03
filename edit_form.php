@@ -17,11 +17,11 @@
 /**
  * Form for editing block instances.
  *
- * @package     block_new_myoverview
+ * @package     block_myoverview_plus
  * @copyright   2021 Laurent David <laurent@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class block_new_myoverview_edit_form extends block_edit_form {
+class block_myoverview_plus_edit_form extends block_edit_form {
 
     /**
      * Extends the configuration form for block_myoverview.
@@ -35,9 +35,9 @@ class block_new_myoverview_edit_form extends block_edit_form {
         $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
         $mform->addElement('text',
             'config_title',
-            get_string('title', 'block_new_myoverview')
+            get_string('title', 'block_myoverview_plus')
         );
-        $mform->setDefault('config_title', get_string('pluginname', 'block_new_myoverview'));
+        $mform->setDefault('config_title', get_string('pluginname', 'block_myoverview_plus'));
         $mform->setType('config_title', PARAM_TEXT);
     }
 }
