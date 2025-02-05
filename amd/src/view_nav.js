@@ -105,25 +105,6 @@ const registerSelector = root => {
         }
     );
 
-    Selector.on(
-        CustomEvents.events.activate,
-        SELECTORS.DISPLAY_OPTION,
-        (e, data) => {
-            const option = $(e.target);
-
-            if (option.hasClass('active')) {
-                return;
-            }
-
-            const filter = option.attr('data-display-option');
-            const pref = option.attr('data-pref');
-
-            root.find(SELECTORS.courseView.region).attr('data-display', option.attr('data-value'));
-            updatePreferences(filter, pref);
-            View.reset(root);
-            data.originalEvent.preventDefault();
-        }
-    );
 };
 
 /**

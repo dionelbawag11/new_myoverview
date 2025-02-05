@@ -44,7 +44,18 @@ use renderer_base;
      */
 
      public function export_for_template(renderer_base $output) {
-        $context = parent::export_for_template($output);
-        return $context;
-     }
+      $context = parent::export_for_template($output);
+      debugging('Context before modification: ' . print_r($context, true), DEBUG_DEVELOPER);
+      
+      $context['layouts'][] = [
+          'id' => 'carousel',
+          'name' => get_string('carousel', 'block_myoverview_plus'),
+          'arialabel' => get_string('aria:carousel', 'block_myoverview_plus'),
+          'active' => ($context['currentview'] ?? '') === 'carousel'
+      ];
+      
+      debugging('Context after modification: ' . print_r($context, true), DEBUG_DEVELOPER);
+      
+      return $context;
+  }
 }

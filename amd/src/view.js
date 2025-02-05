@@ -19,7 +19,10 @@
  * @copyright  2018 Bas Brands <bas@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+import Swiper from 'swiper';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 import $ from 'jquery';
 import * as Repository from 'block_myoverview/repository';
 import * as PagedContentFactory from 'core/paged_content_factory';
@@ -472,40 +475,55 @@ const noCoursesRender = root => {
  * @return {promise} jQuery promise resolved after rendering is complete.
  */
 const renderCourses = (root, coursesData) => {
+    const viewType = root.attr('data-view');
+    let content = '';
 
-    const filters = getFilterValues(root);
-
-    let currentTemplate = '';
-    if (filters.display === 'card') {
-        currentTemplate = TEMPLATES.COURSES_CARDS;
-    } else if (filters.display === 'list') {
-        currentTemplate = TEMPLATES.COURSES_LIST;
-    } else if(filters.display === 'summary'){
-        currentTemplate = TEMPLATES.COURSES_SUMMARY;
-    } else {
-        currentTemplate = TEMPLATES.COURSES_CAROUSEL;
-    }
-
-    if (!coursesData) {
-        return noCoursesRender(root);
-    } else {
-        // Sometimes we get weird objects coming after a failed search, cast to ensure typing functions.
-        if (Array.isArray(coursesData.courses) === false) {
-            coursesData.courses = Object.values(coursesData.courses);
-        }
-        // Whether the course category should be displayed in the course item.
-        coursesData.courses = coursesData.courses.map(course => {
-            course.showcoursecategory = filters.displaycategories === 'on';
-            return course;
+    if (viewType === 'card') {
+        content = '<div class="swiper course-carousel">';
+        content += '<div class="swiper-wrapper">';
+        
+        coursesData.courses.forEach(course => {
+            content += `<div class="swiper-slide">${renderCourseCard(course)}</div>`;
         });
-        if (coursesData.courses.length) {
-            return Templates.render(currentTemplate, {
-                courses: coursesData.courses,
-            });
-        } else {
-            return noCoursesRender(root);
-        }
+
+        content += '</div>'; // Close swiper-wrapper
+        content += '<div class="swiper-button-next"></div><div class="swiper-button-prev"></div>';
+        content += '<div class="swiper-pagination"></div>';
+        content += '</div>'; // Close swiper container
+    } else if (viewType === 'list') {
+        content = renderCourseList(coursesData.courses);
+    } else {
+        content = renderCourseSummary(coursesData.courses);
     }
+
+    return Templates.replaceNodeContents(root.find(SELECTORS.courseView.region), content).then(() => {
+        if (viewType === 'card') {
+            initializeCarousel();
+        }
+    });
+};
+
+/**
+ * Initialize the Swiper carousel for course cards.
+ */
+const initializeCarousel = () => {
+    new Swiper('.course-carousel', {
+        slidesPerView: 1,
+        spaceBetween: 10,
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+        },
+        breakpoints: {
+            640: { slidesPerView: 2 },
+            768: { slidesPerView: 3 },
+            1024: { slidesPerView: 4 }
+        }
+    });
 };
 
 /**
@@ -828,6 +846,58 @@ export const init = root => {
     }
 
     initializePagedContent(root, standardFunctionalityCurry());
+};
+
+export const initCarousel = (root) => {
+    console.log("Initializing Carousel View...");
+
+    const courseContainer = root.find(SELECTORS.courseView.region);
+    courseContainer.empty();  // Clear existing courses
+
+    // Get course data
+    let courses = loadedPages.flatMap(page => page.courses);
+
+    if (courses.length === 0) {
+        console.log("No courses found for Carousel.");
+        return;
+    }
+
+    let carouselHTML = `
+        <div id="carouselContainer" class="carousel">
+            <div class="carousel-inner">
+                ${courses.map((course, index) => `
+                    <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                        <div class="course-card">
+                            <h3>${course.fullname}</h3>
+                            <p>${course.summary}</p>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+            <button class="carousel-control prev">❮</button>
+            <button class="carousel-control next">❯</button>
+        </div>
+    `;
+
+    courseContainer.html(carouselHTML);
+
+    // Carousel Functionality
+    let currentIndex = 0;
+    const items = $('.carousel-item');
+
+    $('.carousel-control.next').click(() => {
+        items.eq(currentIndex).removeClass('active');
+        currentIndex = (currentIndex + 1) % items.length;
+        items.eq(currentIndex).addClass('active');
+    });
+
+    $('.carousel-control.prev').click(() => {
+        items.eq(currentIndex).removeClass('active');
+        currentIndex = (currentIndex - 1 + items.length) % items.length;
+        items.eq(currentIndex).addClass('active');
+    });
+
+    console.log("Carousel View Initialized!");
 };
 
 /**

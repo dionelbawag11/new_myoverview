@@ -20,17 +20,24 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import * as View from 'block_myoverview_plus/view';
-import * as ViewNav from 'block_myoverview_plus/view_nav';
+import * as View from "block_myoverview_plus/view";
+import * as ViewNav from "block_myoverview_plus/view_nav";
+import * as Repository from 'block_myoverview/repository';
 
+
+require(["jquery", "block_myoverview_plus/main"], function ($, Main) {
+  var root = $("#block-myoverview-plus-{{uniqid}}");
+  Main.init(root);
+});
 /**
  * Initialise all of the modules for the overview block.
  *
  * @param {object} root The root element for the overview block.
  */
 export const init = (root) => {
-    // Initialise the course navigation elements.
-    ViewNav.init(root);
-    // Initialise the courses view modules.
-    View.init(root);
+  // Initialise the course navigation elements.
+  ViewNav.init(root);
+  // Initialise the courses view modules.
+  View.init(root);
 };
+

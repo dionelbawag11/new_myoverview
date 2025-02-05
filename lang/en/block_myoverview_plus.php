@@ -26,7 +26,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'New Myoverview';
-
+$string['carousel'] = 'Carousel';
+$string['aria:carousel'] = 'Carousel View';
 $string['carousel'] = 'Carousel';
 //new filters
 $string['aria:mandatory'] = 'Show mandatory courses';
