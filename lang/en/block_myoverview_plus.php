@@ -39,7 +39,6 @@ $string['nocourseselective'] = 'No elective courses';
 $string['mandatory'] = 'Mandatory (New filter)'; 
 $string['notstarted'] = 'Not started (New filter)'; 
 $string['elective'] = 'Elective (New filter)'; 
-
 $string['aria:carousel'] = 'Switch to carousel view';
 $string['aria:coursecarousel'] = 'Course carousel text';
 $string['carousel'] = 'Carousel (New filter)';
@@ -56,3 +55,5 @@ $string['title'] = 'Title';
 $string['myoverview_plus:addinstance'] = 'Add a new my overview block';
 $string['myoverview_plus:myaddinstance'] = 'Add a new my overview block to my moodle';
 $string['privacy:metadata'] = 'The new my overview block just enhance the core my overview block, it doesn"t sotre any data.';
+
+
