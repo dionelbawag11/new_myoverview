@@ -19,10 +19,7 @@
  * @copyright  2018 Bas Brands <bas@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-import Swiper from 'swiper';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
+
 import $ from 'jquery';
 import * as Repository from 'block_myoverview/repository';
 import * as PagedContentFactory from 'core/paged_content_factory';
@@ -31,12 +28,37 @@ import * as CustomEvents from 'core/custom_interaction_events';
 import * as Notification from 'core/notification';
 import * as Templates from 'core/templates';
 import * as CourseEvents from 'core_course/events';
-import SELECTORS from 'block_myoverview/selectors';
+import * as Selectors from 'block_myoverview/selectors';
 import * as PagedContentEvents from 'core/paged_content_events';
+
+import * as Ajax from 'core/ajax';
 import * as Aria from 'core/aria';
 import {debounce} from 'core/utils';
 
-const TEMPLATES = {
+let EnhancedRepostory = Object.assign({}, Repository);
+EnhancedRepostory.getEnrolledCoursesByTimeline = function(args) {
+    let request = {
+        methodname: 'block_myoverview_plus_get_enrolled_courses_by_timeline_classification',
+        args: args
+    };
+
+    return Ajax.call([request])[0];
+};
+
+let SELECTORS = {
+    COURSE_REGION: '[data-region="course-view-content"]',
+    ACTION_HIDE_COURSE: '[data-action="hide-course"]',
+    ACTION_SHOW_COURSE: '[data-action="show-course"]',
+    ACTION_ADD_FAVOURITE: '[data-action="add-favourite"]',
+    ACTION_REMOVE_FAVOURITE: '[data-action="remove-favourite"]',
+    FAVOURITE_ICON: '[data-region="favourite-icon"]',
+    ICON_IS_FAVOURITE: '[data-region="is-favourite"]',
+    ICON_NOT_FAVOURITE: '[data-region="not-favourite"]',
+    PAGED_CONTENT_CONTAINER: '[data-region="page-container"]'
+
+};
+
+let TEMPLATES = {
     COURSES_CARDS: 'block_myoverview/view-cards',
     COURSES_LIST: 'block_myoverview/view-list',
     COURSES_SUMMARY: 'block_myoverview/view-summary',
@@ -44,7 +66,7 @@ const TEMPLATES = {
     NOCOURSES: 'core_course/no-courses'
 };
 
-const GROUPINGS = {
+let GROUPINGS = {
     GROUPING_ALLINCLUDINGHIDDEN: 'allincludinghidden',
     GROUPING_ALL: 'all',
     GROUPING_INPROGRESS: 'inprogress',
@@ -72,7 +94,7 @@ let namespace = null;
  * @param {object} root The root element for the courses view.
  * @return {filters} Set filters.
  */
-const getFilterValues = root => {
+let getFilterValues = root => {
     const courseRegion = root.find(SELECTORS.courseView.region);
     return {
         display: courseRegion.attr('data-display'),
@@ -86,7 +108,7 @@ const getFilterValues = root => {
 
 // We want the paged content controls below the paged content area.
 // and the controls should be ignored while data is loading.
-const DEFAULT_PAGED_CONTENT_CONFIG = {
+let DEFAULT_PAGED_CONTENT_CONFIG = {
     ignoreControlWhileLoading: true,
     controlPlacementBottom: true,
     persistentLimitKey: 'block_myoverview_user_paging_preference'
@@ -99,7 +121,7 @@ const DEFAULT_PAGED_CONTENT_CONFIG = {
  * @param {int} limit The number of courses to show.
  * @return {promise} Resolved with an array of courses.
  */
-const getMyCourses = (filters, limit) => {
+let getMyCourses = (filters, limit) => {
     return Repository.getEnrolledCoursesByTimeline({
         offset: courseOffset,
         limit: limit,
@@ -137,7 +159,7 @@ const getSearchMyCourses = (filters, limit, searchValue) => {
  * @param {Number} courseId Course id number
  * @return {Object} The favourite icon container
  */
-const getFavouriteIconContainer = (root, courseId) => {
+let getFavouriteIconContainer = (root, courseId) => {
     return root.find(SELECTORS.FAVOURITE_ICON + '[data-course-id="' + courseId + '"]');
 };
 
@@ -148,7 +170,7 @@ const getFavouriteIconContainer = (root, courseId) => {
  * @param {Number} index Rendered page index.
  * @return {Object} The rendered paged container.
  */
-const getPagedContentContainer = (root, index) => {
+let getPagedContentContainer = (root, index) => {
     return root.find('[data-region="paged-content-page"][data-page="' + index + '"]');
 };
 
@@ -158,7 +180,7 @@ const getPagedContentContainer = (root, index) => {
  * @param {Object} root The favourite icon container element.
  * @return {Number} Course id.
  */
-const getCourseId = root => {
+let getCourseId = root => {
     return root.attr('data-course-id');
 };
 
@@ -168,14 +190,14 @@ const getCourseId = root => {
  * @param {Object} root The favourite icon container element.
  * @param {Number} courseId Course id number.
  */
-const hideFavouriteIcon = (root, courseId) => {
-    const iconContainer = getFavouriteIconContainer(root, courseId);
+let hideFavouriteIcon = (root, courseId) => {
+    let iconContainer = getFavouriteIconContainer(root, courseId);
 
-    const isFavouriteIcon = iconContainer.find(SELECTORS.ICON_IS_FAVOURITE);
+    let isFavouriteIcon = iconContainer.find(SELECTORS.ICON_IS_FAVOURITE);
     isFavouriteIcon.addClass('hidden');
     Aria.hide(isFavouriteIcon);
 
-    const notFavourteIcon = iconContainer.find(SELECTORS.ICON_NOT_FAVOURITE);
+    let notFavourteIcon = iconContainer.find(SELECTORS.ICON_NOT_FAVOURITE);
     notFavourteIcon.removeClass('hidden');
     Aria.unhide(notFavourteIcon);
 };
@@ -186,8 +208,8 @@ const hideFavouriteIcon = (root, courseId) => {
  * @param {Object} root The course overview container.
  * @param {Number} courseId Course id number.
  */
-const showFavouriteIcon = (root, courseId) => {
-    const iconContainer = getFavouriteIconContainer(root, courseId);
+let showFavouriteIcon = (root, courseId) => {
+    let iconContainer = getFavouriteIconContainer(root, courseId);
 
     const isFavouriteIcon = iconContainer.find(SELECTORS.ICON_IS_FAVOURITE);
     isFavouriteIcon.removeClass('hidden');
@@ -458,14 +480,14 @@ const setCourseFavouriteState = (courseId, status) => {
  * @param {object} root The root element for the courses view.
  * @return {promise} jQuery promise resolved after rendering is complete.
  */
-const noCoursesRender = root => {
-    const nocoursesimg = root.find(SELECTORS.courseView.region).attr('data-nocoursesimg');
-    const newcourseurl = root.find(SELECTORS.courseView.region).attr('data-newcourseurl');
-    return Templates.render(TEMPLATES.NOCOURSES, {
-        nocoursesimg: nocoursesimg,
-        newcourseurl: newcourseurl
-    });
-};
+// const noCoursesRender = root => {
+//     const nocoursesimg = root.find(SELECTORS.courseView.region).attr('data-nocoursesimg');
+//     const newcourseurl = root.find(SELECTORS.courseView.region).attr('data-newcourseurl');
+//     return Templates.render(TEMPLATES.NOCOURSES, {
+//         nocoursesimg: nocoursesimg,
+//         newcourseurl: newcourseurl
+//     });
+// };
 
 /**
  * Render the dashboard courses.
@@ -474,57 +496,39 @@ const noCoursesRender = root => {
  * @param {array} coursesData containing array of returned courses.
  * @return {promise} jQuery promise resolved after rendering is complete.
  */
-const renderCourses = (root, coursesData) => {
-    const viewType = root.attr('data-view');
-    let content = '';
+let renderCourses = function(root, coursesData) {
 
-    if (viewType === 'card') {
-        content = '<div class="swiper course-carousel">';
-        content += '<div class="swiper-wrapper">';
-        
-        coursesData.courses.forEach(course => {
-            content += `<div class="swiper-slide">${renderCourseCard(course)}</div>`;
-        });
+    const filters = getFilterValues(root);
 
-        content += '</div>'; // Close swiper-wrapper
-        content += '<div class="swiper-button-next"></div><div class="swiper-button-prev"></div>';
-        content += '<div class="swiper-pagination"></div>';
-        content += '</div>'; // Close swiper container
-    } else if (viewType === 'list') {
-        content = renderCourseList(coursesData.courses);
+    let currentTemplate;
+    if (filters.display === 'card') {
+        currentTemplate = TEMPLATES.COURSES_CARDS;
+    } else if (filters.display === 'list') {
+        currentTemplate = TEMPLATES.COURSES_LIST;
+    }  else if (filters.display === 'carousel') {
+        currentTemplate = TEMPLATES.COURSES_CAROUSEL;
     } else {
-        content = renderCourseSummary(coursesData.courses);
+        currentTemplate = TEMPLATES.COURSES_SUMMARY;
     }
 
-    return Templates.replaceNodeContents(root.find(SELECTORS.courseView.region), content).then(() => {
-        if (viewType === 'card') {
-            initializeCarousel();
-        }
+    // Whether the course category should be displayed in the course item.
+    coursesData.courses = coursesData.courses.map(function(course) {
+        course.showcoursecategory = filters.displaycategories === 'on';
+        return course;
     });
+
+    if (coursesData.courses.length) {
+        return Templates.render(currentTemplate, {
+            courses: coursesData.courses,
+        });
+    } else {
+        let nocoursesimg = root.find(Selectors.courseView.region).attr('data-nocoursesimg');
+        return Templates.render(TEMPLATES.NOCOURSES, {
+            nocoursesimg: nocoursesimg
+        });
+    }
 };
 
-/**
- * Initialize the Swiper carousel for course cards.
- */
-const initializeCarousel = () => {
-    new Swiper('.course-carousel', {
-        slidesPerView: 1,
-        spaceBetween: 10,
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-        },
-        pagination: {
-            el: '.swiper-pagination',
-            clickable: true,
-        },
-        breakpoints: {
-            640: { slidesPerView: 2 },
-            768: { slidesPerView: 3 },
-            1024: { slidesPerView: 4 }
-        }
-    });
-};
 
 /**
  * Return the callback to be passed to the subscribe event
@@ -532,9 +536,8 @@ const initializeCarousel = () => {
  * @param {object} root The root element for the courses view
  * @return {function} Partially applied function that'll execute when passed a limit
  */
-const setLimit = root => {
-    // @param {Number} limit The paged limit that is passed through the event.
-    return limit => root.find(SELECTORS.courseView.region).attr('data-paging', limit);
+let setLimit = function(limit) {
+    this.find(Selectors.courseView.region).attr('data-paging', limit);
 };
 
 /**
@@ -544,10 +547,11 @@ const setLimit = root => {
  * @param {object} root The root element for the courses view
  * @param {string} namespace The namespace for all the events attached
  */
-const registerPagedEventHandlers = (root, namespace) => {
-    const event = namespace + PagedContentEvents.SET_ITEMS_PER_PAGE_LIMIT;
-    PubSub.subscribe(event, setLimit(root));
+let registerPagedEventHandlers = function(root, namespace) {
+    let event = namespace + PagedContentEvents.SET_ITEMS_PER_PAGE_LIMIT;
+    PubSub.subscribe(event, setLimit.bind(root));
 };
+
 
 /**
  * Figure out how many items are going to be allowed to be rendered in the block.
@@ -556,25 +560,25 @@ const registerPagedEventHandlers = (root, namespace) => {
  * @param  {Object} root The course overview container
  * @return {Number[]} How many courses will be rendered
  */
-const itemsPerPageFunc = (pagingLimit, root) => {
-    let itemsPerPage = NUMCOURSES_PERPAGE.map(value => {
-        let active = false;
-        if (value === pagingLimit) {
-            active = true;
-        }
+// const itemsPerPageFunc = (pagingLimit, root) => {
+//     let itemsPerPage = NUMCOURSES_PERPAGE.map(value => {
+//         let active = false;
+//         if (value === pagingLimit) {
+//             active = true;
+//         }
 
-        return {
-            value: value,
-            active: active
-        };
-    });
+//         return {
+//             value: value,
+//             active: active
+//         };
+//     });
 
-    // Filter out all pagination options which are too large for the amount of courses user is enrolled in.
-    const totalCourseCount = parseInt(root.find(SELECTORS.courseView.region).attr('data-totalcoursecount'), 10);
-    return itemsPerPage.filter(pagingOption => {
-        return pagingOption.value < totalCourseCount || pagingOption.value === 0;
-    });
-};
+//     // Filter out all pagination options which are too large for the amount of courses user is enrolled in.
+//     const totalCourseCount = parseInt(root.find(SELECTORS.courseView.region).attr('data-totalcoursecount'), 10);
+//     return itemsPerPage.filter(pagingOption => {
+//         return pagingOption.value < totalCourseCount || pagingOption.value === 0;
+//     });
+// };
 
 /**
  * Mutates and controls the loadedPages array and handles the bootstrapping.
@@ -585,82 +589,82 @@ const itemsPerPageFunc = (pagingLimit, root) => {
  * @param {Object} actions Paged content helper
  * @param {null|boolean} activeSearch Are we currently actively searching and building up search results?
  */
-const pageBuilder = (coursesData, currentPage, pageData, actions, activeSearch = null) => {
-    // If the courseData comes in an object then get the value otherwise it is a pure array.
-    let courses = coursesData.courses ? coursesData.courses : coursesData;
-    let nextPageStart = 0;
-    let pageCourses = [];
+// const pageBuilder = (coursesData, currentPage, pageData, actions, activeSearch = null) => {
+//     // If the courseData comes in an object then get the value otherwise it is a pure array.
+//     let courses = coursesData.courses ? coursesData.courses : coursesData;
+//     let nextPageStart = 0;
+//     let pageCourses = [];
 
-    // If current page's data is loaded make sure we max it to page limit.
-    if (typeof (loadedPages[currentPage]) !== 'undefined') {
-        pageCourses = loadedPages[currentPage].courses;
-        const currentPageLength = pageCourses.length;
-        if (currentPageLength < pageData.limit) {
-            nextPageStart = pageData.limit - currentPageLength;
-            pageCourses = {...loadedPages[currentPage].courses, ...courses.slice(0, nextPageStart)};
-        }
-    } else {
-        // When the page limit is zero, there is only one page of courses, no start for next page.
-        nextPageStart = pageData.limit || false;
-        pageCourses = (pageData.limit > 0) ? courses.slice(0, pageData.limit) : courses;
-    }
+//     // If current page's data is loaded make sure we max it to page limit.
+//     if (typeof (loadedPages[currentPage]) !== 'undefined') {
+//         pageCourses = loadedPages[currentPage].courses;
+//         const currentPageLength = pageCourses.length;
+//         if (currentPageLength < pageData.limit) {
+//             nextPageStart = pageData.limit - currentPageLength;
+//             pageCourses = {...loadedPages[currentPage].courses, ...courses.slice(0, nextPageStart)};
+//         }
+//     } else {
+//         // When the page limit is zero, there is only one page of courses, no start for next page.
+//         nextPageStart = pageData.limit || false;
+//         pageCourses = (pageData.limit > 0) ? courses.slice(0, pageData.limit) : courses;
+//     }
 
-    // Finished setting up the current page.
-    loadedPages[currentPage] = {
-        courses: pageCourses
-    };
+//     // Finished setting up the current page.
+//     loadedPages[currentPage] = {
+//         courses: pageCourses
+//     };
 
-    // Set up the next page (if there is more than one page).
-    const remainingCourses = nextPageStart !== false ? courses.slice(nextPageStart, courses.length) : [];
-    if (remainingCourses.length) {
-        loadedPages[currentPage + 1] = {
-            courses: remainingCourses
-        };
-    }
+//     // Set up the next page (if there is more than one page).
+//     const remainingCourses = nextPageStart !== false ? courses.slice(nextPageStart, courses.length) : [];
+//     if (remainingCourses.length) {
+//         loadedPages[currentPage + 1] = {
+//             courses: remainingCourses
+//         };
+//     }
 
-    // Set the last page to either the current or next page.
-    if (loadedPages[currentPage].courses.length < pageData.limit || !remainingCourses.length) {
-        lastPage = currentPage;
-        if (activeSearch === null) {
-            actions.allItemsLoaded(currentPage);
-        }
-    } else if (typeof (loadedPages[currentPage + 1]) !== 'undefined'
-        && loadedPages[currentPage + 1].courses.length < pageData.limit) {
-        lastPage = currentPage + 1;
-    }
+//     // Set the last page to either the current or next page.
+//     if (loadedPages[currentPage].courses.length < pageData.limit || !remainingCourses.length) {
+//         lastPage = currentPage;
+//         if (activeSearch === null) {
+//             actions.allItemsLoaded(currentPage);
+//         }
+//     } else if (typeof (loadedPages[currentPage + 1]) !== 'undefined'
+//         && loadedPages[currentPage + 1].courses.length < pageData.limit) {
+//         lastPage = currentPage + 1;
+//     }
 
-    courseOffset = coursesData.nextoffset;
-};
+//     courseOffset = coursesData.nextoffset;
+// };
 
 /**
  * In cases when switching between regular rendering and search rendering we need to reset some variables.
  */
-const resetGlobals = () => {
-    courseOffset = 0;
-    loadedPages = [];
-    lastPage = 0;
-    lastLimit = 0;
-};
+// const resetGlobals = () => {
+//     courseOffset = 0;
+//     loadedPages = [];
+//     lastPage = 0;
+//     lastLimit = 0;
+// };
 
 /**
  * The default functionality of fetching paginated courses without special handling.
  *
  * @return {function(Object, Object, Object, Object, Object, Promise, Number): void}
  */
-const standardFunctionalityCurry = () => {
-    resetGlobals();
-    return (filters, currentPage, pageData, actions, root, promises, limit) => {
-        const pagePromise = getMyCourses(
-            filters,
-            limit
-        ).then(coursesData => {
-            pageBuilder(coursesData, currentPage, pageData, actions);
-            return renderCourses(root, loadedPages[currentPage]);
-        }).catch(Notification.exception);
+// const standardFunctionalityCurry = () => {
+//     resetGlobals();
+//     return (filters, currentPage, pageData, actions, root, promises, limit) => {
+//         const pagePromise = getMyCourses(
+//             filters,
+//             limit
+//         ).then(coursesData => {
+//             pageBuilder(coursesData, currentPage, pageData, actions);
+//             return renderCourses(root, loadedPages[currentPage]);
+//         }).catch(Notification.exception);
 
-        promises.push(pagePromise);
-    };
-};
+//         promises.push(pagePromise);
+//     };
+// };
 
 /**
  * Initialize the searching functionality so we can call it when required.
@@ -690,24 +694,43 @@ const searchFunctionalityCurry = () => {
  * @param {function} promiseFunction How do we fetch the courses and what do we do with them?
  * @param {null | string} inputValue What to search for
  */
-const initializePagedContent = (root, promiseFunction, inputValue = null) => {
-    const pagingLimit = parseInt(root.find(SELECTORS.courseView.region).attr('data-paging'), 10);
-    let itemsPerPage = itemsPerPageFunc(pagingLimit, root);
+let initializePagedContent = function(root) {
+    namespace = "block_myoverview_" + root.attr('id') + "_" + Math.random();
 
-    const filters = getFilterValues(root);
-    const config = {...{}, ...DEFAULT_PAGED_CONTENT_CONFIG};
+    let pagingLimit = parseInt(root.find(Selectors.courseView.region).attr('data-paging'), 10);
+    let itemsPerPage = NUMCOURSES_PERPAGE.map(function(value) {
+        let active = false;
+        if (value === pagingLimit) {
+            active = true;
+        }
+
+        return {
+            value: value,
+            active: active
+        };
+    });
+
+    // Filter out all pagination options which are too large for the amount of courses user is enrolled in.
+    let totalCourseCount = parseInt(root.find(Selectors.courseView.region).attr('data-totalcoursecount'), 10);
+    itemsPerPage = itemsPerPage.filter(function(pagingOption) {
+        return pagingOption.value < totalCourseCount || pagingOption.value === 0;
+    });
+
+    let filters = getFilterValues(root);
+    let config = $.extend({}, DEFAULT_PAGED_CONTENT_CONFIG);
     config.eventNamespace = namespace;
 
-    const pagedContentPromise = PagedContentFactory.createWithLimit(
+    let pagedContentPromise = PagedContentFactory.createWithLimit(
         itemsPerPage,
-        (pagesData, actions) => {
+        function(pagesData, actions) {
             let promises = [];
-            pagesData.forEach(pageData => {
-                const currentPage = pageData.pageNumber;
+
+            pagesData.forEach(function(pageData) {
+                let currentPage = pageData.pageNumber;
                 let limit = (pageData.limit > 0) ? pageData.limit : 0;
 
                 // Reset local variables if limits have changed.
-                if (+lastLimit !== +limit) {
+                if (lastLimit !== limit) {
                     loadedPages = [];
                     courseOffset = 0;
                     lastPage = 0;
@@ -723,23 +746,72 @@ const initializePagedContent = (root, promiseFunction, inputValue = null) => {
                 lastLimit = limit;
 
                 // Get 2 pages worth of data as we will need it for the hidden functionality.
-                if (typeof (loadedPages[currentPage + 1]) === 'undefined') {
-                    if (typeof (loadedPages[currentPage]) === 'undefined') {
+                if (loadedPages[currentPage + 1] === undefined) {
+                    if (loadedPages[currentPage] === undefined) {
                         limit *= 2;
                     }
                 }
 
-                // Call the curried function that'll handle the course promise and any manipulation of it.
-                promiseFunction(filters, currentPage, pageData, actions, root, promises, limit, inputValue);
+                let pagePromise = getMyCourses(
+                    filters,
+                    limit
+                ).then(function(coursesData) {
+                    let courses = coursesData.courses;
+                    let nextPageStart = 0;
+                    let pageCourses;
+
+                    // If current page's data is loaded make sure we max it to page limit.
+                    if (loadedPages[currentPage] !== undefined) {
+                        pageCourses = loadedPages[currentPage].courses;
+                        let currentPageLength = pageCourses.length;
+                        if (currentPageLength < pageData.limit) {
+                            nextPageStart = pageData.limit - currentPageLength;
+                            pageCourses = $.merge(loadedPages[currentPage].courses, courses.slice(0, nextPageStart));
+                        }
+                    } else {
+                        // When the page limit is zero, there is only one page of courses, no start for next page.
+                        nextPageStart = pageData.limit || false;
+                        pageCourses = (pageData.limit > 0) ? courses.slice(0, pageData.limit) : courses;
+                    }
+
+                    // Finished setting up the current page.
+                    loadedPages[currentPage] = {
+                        courses: pageCourses
+                    };
+
+                    // Set up the next page (if there is more than one page).
+                    const remainingCourses = nextPageStart !== false ? courses.slice(nextPageStart, courses.length) : [];
+                    if (remainingCourses.length) {
+                        loadedPages[currentPage + 1] = {
+                            courses: remainingCourses
+                        };
+                    }
+
+                    // Set the last page to either the current or next page.
+                    if (loadedPages[currentPage].courses.length < pageData.limit || !remainingCourses.length) {
+                        lastPage = currentPage;
+                        actions.allItemsLoaded(currentPage);
+                    } else if (loadedPages[currentPage + 1] !== undefined
+                        && loadedPages[currentPage + 1].courses.length < pageData.limit) {
+                        lastPage = currentPage + 1;
+                    }
+
+                    courseOffset = coursesData.nextoffset;
+                    return renderCourses(root, loadedPages[currentPage]);
+                })
+                    .catch(Notification.exception);
+
+                promises.push(pagePromise);
             });
+
             return promises;
         },
         config
     );
 
-    pagedContentPromise.then((html, js) => {
+    pagedContentPromise.then(function(html, js) {
         registerPagedEventHandlers(root, namespace);
-        return Templates.replaceNodeContents(root.find(SELECTORS.courseView.region), html, js);
+        return Templates.replaceNodeContents(root.find(Selectors.courseView.region), html, js);
     }).catch(Notification.exception);
 };
 
@@ -749,43 +821,43 @@ const initializePagedContent = (root, promiseFunction, inputValue = null) => {
  * @param {Object} root The myoverview block container element.
  * @param {HTMLElement} page The whole HTMLElement for our block.
  */
-const registerEventListeners = (root, page) => {
-
+let registerEventListeners = function(root) {
     CustomEvents.define(root, [
         CustomEvents.events.activate
     ]);
 
-    root.on(CustomEvents.events.activate, SELECTORS.ACTION_ADD_FAVOURITE, (e, data) => {
-        const favourite = $(e.target).closest(SELECTORS.ACTION_ADD_FAVOURITE);
-        const courseId = getCourseId(favourite);
+    root.on(CustomEvents.events.activate, SELECTORS.ACTION_ADD_FAVOURITE, function(e, data) {
+        let favourite = $(e.target).closest(SELECTORS.ACTION_ADD_FAVOURITE);
+        let courseId = getCourseId(favourite);
         addToFavourites(root, courseId);
         data.originalEvent.preventDefault();
     });
 
-    root.on(CustomEvents.events.activate, SELECTORS.ACTION_REMOVE_FAVOURITE, (e, data) => {
-        const favourite = $(e.target).closest(SELECTORS.ACTION_REMOVE_FAVOURITE);
-        const courseId = getCourseId(favourite);
+    root.on(CustomEvents.events.activate, SELECTORS.ACTION_REMOVE_FAVOURITE, function(e, data) {
+        let favourite = $(e.target).closest(SELECTORS.ACTION_REMOVE_FAVOURITE);
+        let courseId = getCourseId(favourite);
         removeFromFavourites(root, courseId);
         data.originalEvent.preventDefault();
     });
 
-    root.on(CustomEvents.events.activate, SELECTORS.FAVOURITE_ICON, (e, data) => {
+    root.on(CustomEvents.events.activate, SELECTORS.FAVOURITE_ICON, function(e, data) {
         data.originalEvent.preventDefault();
     });
 
-    root.on(CustomEvents.events.activate, SELECTORS.ACTION_HIDE_COURSE, (e, data) => {
-        const target = $(e.target).closest(SELECTORS.ACTION_HIDE_COURSE);
-        const courseId = getCourseId(target);
+    root.on(CustomEvents.events.activate, SELECTORS.ACTION_HIDE_COURSE, function(e, data) {
+        let target = $(e.target).closest(SELECTORS.ACTION_HIDE_COURSE);
+        let courseId = getCourseId(target);
         hideCourse(root, courseId);
         data.originalEvent.preventDefault();
     });
 
-    root.on(CustomEvents.events.activate, SELECTORS.ACTION_SHOW_COURSE, (e, data) => {
-        const target = $(e.target).closest(SELECTORS.ACTION_SHOW_COURSE);
-        const courseId = getCourseId(target);
+    root.on(CustomEvents.events.activate, SELECTORS.ACTION_SHOW_COURSE, function(e, data) {
+        let target = $(e.target).closest(SELECTORS.ACTION_SHOW_COURSE);
+        let courseId = getCourseId(target);
         showCourse(root, courseId);
         data.originalEvent.preventDefault();
     });
+};
 
     // Searching functionality event handlers.
     const input = page.querySelector(SELECTORS.region.searchInput);
@@ -805,7 +877,6 @@ const registerEventListeners = (root, page) => {
             initializePagedContent(root, searchFunctionalityCurry(), input.value.trim());
         }
     }, 1000));
-};
 
 /**
  * Reset the search icon and trigger the init for the block.
@@ -832,73 +903,21 @@ const activeSearch = (clearIcon) => {
  *
  * @param {object} root The root element for the courses view.
  */
-export const init = root => {
+let init = function(root) {
     root = $(root);
     loadedPages = [];
     lastPage = 0;
     courseOffset = 0;
 
+    initializePagedContent(root);
+
     if (!root.attr('data-init')) {
-        const page = document.querySelector(SELECTORS.region.selectBlock);
-        registerEventListeners(root, page);
-        namespace = "block_myoverview_" + root.attr('id') + "_" + Math.random();
+        registerEventListeners(root);
         root.attr('data-init', true);
     }
-
-    initializePagedContent(root, standardFunctionalityCurry());
 };
 
-export const initCarousel = (root) => {
-    console.log("Initializing Carousel View...");
 
-    const courseContainer = root.find(SELECTORS.courseView.region);
-    courseContainer.empty();  // Clear existing courses
-
-    // Get course data
-    let courses = loadedPages.flatMap(page => page.courses);
-
-    if (courses.length === 0) {
-        console.log("No courses found for Carousel.");
-        return;
-    }
-
-    let carouselHTML = `
-        <div id="carouselContainer" class="carousel">
-            <div class="carousel-inner">
-                ${courses.map((course, index) => `
-                    <div class="carousel-item ${index === 0 ? 'active' : ''}">
-                        <div class="course-card">
-                            <h3>${course.fullname}</h3>
-                            <p>${course.summary}</p>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-            <button class="carousel-control prev">❮</button>
-            <button class="carousel-control next">❯</button>
-        </div>
-    `;
-
-    courseContainer.html(carouselHTML);
-
-    // Carousel Functionality
-    let currentIndex = 0;
-    const items = $('.carousel-item');
-
-    $('.carousel-control.next').click(() => {
-        items.eq(currentIndex).removeClass('active');
-        currentIndex = (currentIndex + 1) % items.length;
-        items.eq(currentIndex).addClass('active');
-    });
-
-    $('.carousel-control.prev').click(() => {
-        items.eq(currentIndex).removeClass('active');
-        currentIndex = (currentIndex - 1 + items.length) % items.length;
-        items.eq(currentIndex).addClass('active');
-    });
-
-    console.log("Carousel View Initialized!");
-};
 
 /**
  * Reset the courses views to their original

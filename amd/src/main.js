@@ -22,7 +22,6 @@
 
 import * as View from "block_myoverview_plus/view";
 import * as ViewNav from "block_myoverview_plus/view_nav";
-import * as Repository from 'block_myoverview/repository';
 
 
 require(["jquery", "block_myoverview_plus/main"], function ($, Main) {
